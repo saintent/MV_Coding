@@ -125,8 +125,9 @@ M_STATUS GenRead(ReadMsgStruct_typedef* obj, unsigned char* out, unsigned char* 
 M_STATUS GetVolt(unsigned long* Volt);
 M_STATUS GetAMP(unsigned long* Amp);
 M_STATUS GetPower(unsigned long* Power);
-M_STATUS GetPower(unsigned long* En);
+M_STATUS GetEnergy(unsigned long* En);
 M_STATUS GetFrequncy(unsigned long* Fq);
+M_STATUS GetPF(unsigned long* Pf);
 #endif
 
 #endif /* MODBUS_H_ */

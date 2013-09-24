@@ -15,8 +15,12 @@ M_STATUS GetPower(unsigned long* Power) {
 	Power[0] = ac1.Power;
 	return M_SUCCESS;
 }
-M_STATUS GetPower(unsigned long* En) {
+M_STATUS GetEnergy(unsigned long* En) {
 	En[0] = ac1.Energy;
+	return M_SUCCESS;
+}
+M_STATUS GetPF(unsigned long* Pf) {
+	Pf[0] = ac1.PowerFactor;
 	return M_SUCCESS;
 }
 M_STATUS GetFrequncy(unsigned long* Fq) {
