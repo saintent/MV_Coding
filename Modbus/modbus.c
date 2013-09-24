@@ -23,6 +23,13 @@ M_STATUS GetFrequncy(unsigned long* Fq) {
 	Fq[0] = ac1.Frequency;
 	return M_SUCCESS;
 }
+M_STATUS Read(unsigned char* out, unsigned char* len){
+	ReadMsgStruct_typedef readMsg = { .Node = 1,
+			.Fn = ReadInputRegister,
+			.StartAddr = VOLT,
+			.Quantity = 7};
+	return GenRead(&readMsg, out, len);
+}
 #endif
 
 M_STATUS VerifiedPackage(unsigned char* dat, unsigned char len){
