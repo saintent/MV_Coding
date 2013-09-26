@@ -114,12 +114,12 @@ M_STATUS Modbus::GenRead(ReadMsgStruct_typedef* obj, unsigned char* out, unsigne
 void Modbus::CalCrc(unsigned char* dat, unsigned char len, unsigned short* out) {
 	 unsigned char cRCHI = 0xFF;
 	 unsigned char cRCLO = 0xFF;
-	 unsigned index;
-	 unsigned dPtr = 0;
-	 while (len--) {
-		 index = cRCHI ^ dat[dPtr];
-		 cRCHI = cRCLO ^ auchCRCHi[index];
-		 cRCLO = auchCRCLo[index];
+	 unsigned short index;
+	 for(int i = 0; i < len; i++) {
+
+		 index = (unsigned short)(cRCHI ^ dat[i]);
+		 cRCHI = (unsigned char)(cRCLO ^ auchCRCHi[index]);
+		 cRCLO = (unsigned char)auchCRCLo[index];
 	 }
 	 out[0] = ((unsigned short)cRCHI << 8) | (unsigned short)cRCLO;
 }
