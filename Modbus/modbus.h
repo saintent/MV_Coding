@@ -1,7 +1,7 @@
 /*
- * modbus.h
+ * Modbus.h
  *
- *  Created on: Sep 24, 2013
+ *  Created on: Sep 27, 2013
  *      Author: Prustya
  */
 
@@ -9,7 +9,6 @@
 #define MODBUS_H_
 
 #define AC1_METER
-
 typedef enum {
 	MODE_TX,
 	MODE_RX
@@ -116,19 +115,29 @@ const char auchCRCLo[] = { 0x00, 0xC0, 0xC1, 0x01, 0xC3, 0x03, 0x02, 0xC2, 0xC6,
 		0x48, 0x49, 0x89, 0x4B, 0x8B, 0x8A, 0x4A, 0x4E, 0x8E, 0x8F, 0x4F, 0x8D,
 		0x4D, 0x4C, 0x8C, 0x44, 0x84, 0x85, 0x45, 0x87, 0x47, 0x46, 0x86, 0x82,
 		0x42, 0x43, 0x83, 0x41, 0x81, 0x80, 0x40 };
-M_STATUS Read(unsigned char* out, unsigned char* len);
-M_STATUS VerifiedPackage(unsigned char* dat, unsigned char len);
-void CalCrc(unsigned char* dat, unsigned char len, unsigned short* out);
-M_STATUS GenRead(ReadMsgStruct_typedef* obj, unsigned char* out, unsigned char* len);
 
-#ifdef AC1_METER
-M_STATUS GetVolt(unsigned long* Volt);
-M_STATUS GetAMP(unsigned long* Amp);
-M_STATUS GetPower(unsigned long* Power);
-M_STATUS GetEnergy(unsigned long* En);
-M_STATUS GetFrequncy(unsigned long* Fq);
-M_STATUS GetPF(unsigned long* Pf);
-extern AC1_Meter_typedef ac1;
-#endif
+class Modbus {
+public:
+	Modbus();
+	virtual ~Modbus();
+	public :
+	M_STATUS Read(unsigned char* out, unsigned char* len);
+	M_STATUS VerifiedPackage(unsigned char* dat, unsigned char len);
+	private :
+	void CalCrc(unsigned char* dat, unsigned char len, unsigned short* out);
+	M_STATUS GenRead(ReadMsgStruct_typedef* obj, unsigned char* out, unsigned char* len);
+
+	#ifdef AC1_METER
+	public :
+	M_STATUS GetVolt(unsigned long* Volt);
+	M_STATUS GetAMP(unsigned long* Amp);
+	M_STATUS GetPower(unsigned long* Power);
+	M_STATUS GetEnergy(unsigned long* En);
+	M_STATUS GetFrequncy(unsigned long* Fq);
+	M_STATUS GetPF(unsigned long* Pf);
+
+	AC1_Meter_typedef ac1;
+	#endif
+};
 
 #endif /* MODBUS_H_ */
