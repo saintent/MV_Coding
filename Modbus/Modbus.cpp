@@ -105,9 +105,9 @@ M_STATUS Modbus::GenRead(ReadMsgStruct_typedef* obj, unsigned char* out, unsigne
 	out[3] = (unsigned char)obj->StartAddr;
 	out[4] = (unsigned char)(obj->Quantity >> 8);
 	out[5] = (unsigned char)obj->Quantity;
-	crc = CalCrc(out, 6, &crc);
+	CalCrc(out, 6, &crc);
 	out[6] = (unsigned char)crc >> 8;
-	out[7] = (unsigned char)crc;
+	out[7] |= (unsigned char)crc;
 	len[0] = 8;
 	return M_SUCCESS;
 }
