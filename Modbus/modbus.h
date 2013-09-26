@@ -128,6 +128,7 @@ M_STATUS GetPower(unsigned long* Power);
 M_STATUS GetEnergy(unsigned long* En);
 M_STATUS GetFrequncy(unsigned long* Fq);
 M_STATUS GetPF(unsigned long* Pf);
+extern AC1_Meter_typedef ac1;
 #endif
 
 #endif /* MODBUS_H_ */
