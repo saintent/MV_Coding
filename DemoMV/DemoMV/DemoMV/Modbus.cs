@@ -36,13 +36,13 @@ namespace DemoMV
     };
     public enum ReadInputRegister_typedef
     {
-        VOLT = 30001,
-        AMP = 30003,
-        POWER = 30005,
-        ENERGY = 30007,
-        HOUR_METER = 30009,
-        POWER_FACTOR = 30011,
-        FREQUENCY = 30013
+        VOLT = 0,
+        AMP = 2,
+        POWER = 4,
+        ENERGY = 6,
+        HOUR_METER = 8,
+        POWER_FACTOR = 10,
+        FREQUENCY = 12
     };
     public enum M_STATUS
     {
@@ -87,10 +87,10 @@ namespace DemoMV
         public void ReadValue(byte[] data)
         {
             ReadInputRegister_typedef next = LastRead;
-            int bytecout = data[2];
+            int bytecout = data[2] + 3;
             bool start = true;
             int bitsf = 0;
-            for (int i = 0; i < bytecout; i++)
+            for (int i = 3; i < bytecout; i++)
             {
                 if (next == ReadInputRegister_typedef.VOLT)
                 {
@@ -104,6 +104,7 @@ namespace DemoMV
                     Volt |= data[i] << bitsf;
                     if (bitsf == 0)
                     {
+                        Volt = Volt >> 16;
                         start = true;
                         next = ReadInputRegister_typedef.AMP;
                     }
@@ -120,6 +121,7 @@ namespace DemoMV
                     Amp |= data[i] << bitsf;
                     if (bitsf == 0)
                     {
+                        Amp = Amp >> 16;
                         start = true;
                         next = ReadInputRegister_typedef.POWER;
                     }
@@ -136,6 +138,7 @@ namespace DemoMV
                     Power |= data[i] << bitsf;
                     if (bitsf == 0)
                     {
+                        Power = Power >> 16;
                         start = true;
                         next = ReadInputRegister_typedef.ENERGY;
                     }
@@ -152,6 +155,7 @@ namespace DemoMV
                     Energy |= data[i] << bitsf;
                     if (bitsf == 0)
                     {
+                        Energy = Energy >> 16;
                         start = true;
                         next = ReadInputRegister_typedef.HOUR_METER;
                     }
@@ -168,8 +172,9 @@ namespace DemoMV
                     HourMeter |= data[i] << bitsf;
                     if (bitsf == 0)
                     {
+                        HourMeter = HourMeter >> 16;
                         start = true;
-                        next = ReadInputRegister_typedef.FREQUENCY;
+                        next = ReadInputRegister_typedef.POWER_FACTOR;
                     }
                 }
                 else if (next == ReadInputRegister_typedef.FREQUENCY)
@@ -184,8 +189,8 @@ namespace DemoMV
                     Frequency |= data[i] << bitsf;
                     if (bitsf == 0)
                     {
+                        Frequency = Frequency >> 16;
                         start = true;
-                        next = ReadInputRegister_typedef.POWER_FACTOR;
                     }
                 }
                 else if (next == ReadInputRegister_typedef.POWER_FACTOR)
@@ -198,6 +203,12 @@ namespace DemoMV
                     }
                     bitsf = bitsf - 8;
                     PowerFactor |= data[i] << bitsf;
+                    if (bitsf == 0)
+                    {
+                        PowerFactor = PowerFactor >> 16;
+                        start = true;
+                        next = ReadInputRegister_typedef.FREQUENCY;
+                    }
                 }
             }
         }

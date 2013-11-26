@@ -201,45 +201,45 @@ namespace DemoMV
                                     else if (argv[1].ToLower() == "v")
                                     {
                                         mpkg = modbus.GenPkg(MOBUSFnCode_typedef.ReadInputRegister,
-                                            (ushort)ReadInputRegister_typedef.VOLT, 1);
+                                            (ushort)ReadInputRegister_typedef.VOLT, 2);
 
                                     }
                                     else if (argv[1].ToLower() == "i")
                                     {
                                         mpkg = modbus.GenPkg(MOBUSFnCode_typedef.ReadInputRegister,
-                                            (ushort)ReadInputRegister_typedef.AMP, 1);
+                                            (ushort)ReadInputRegister_typedef.AMP, 2);
                                     }
 
                                     else if (argv[1].ToLower() == "p")
                                     {
                                         mpkg = modbus.GenPkg(MOBUSFnCode_typedef.ReadInputRegister,
-                                            (ushort)ReadInputRegister_typedef.POWER, 1);
+                                            (ushort)ReadInputRegister_typedef.POWER, 2);
                                     }
                                     else if (argv[1].ToLower() == "e")
                                     {
                                         mpkg = modbus.GenPkg(MOBUSFnCode_typedef.ReadInputRegister,
-                                            (ushort)ReadInputRegister_typedef.ENERGY, 1);
+                                            (ushort)ReadInputRegister_typedef.ENERGY, 2);
                                     }
                                     else if (argv[1].ToLower() == "pf")
                                     {
                                         mpkg = modbus.GenPkg(MOBUSFnCode_typedef.ReadInputRegister,
-                                            (ushort)ReadInputRegister_typedef.POWER_FACTOR, 1);
+                                            (ushort)ReadInputRegister_typedef.POWER_FACTOR, 2);
                                     }
                                     else if (argv[1].ToLower() == "fq")
                                     {
                                         mpkg = modbus.GenPkg(MOBUSFnCode_typedef.ReadInputRegister,
-                                            (ushort)ReadInputRegister_typedef.FREQUENCY, 1);
+                                            (ushort)ReadInputRegister_typedef.FREQUENCY, 2);
                                     }
                                     else if (argv[1].ToLower() == "all")
                                     {
                                         mpkg = modbus.GenPkg(MOBUSFnCode_typedef.ReadInputRegister,
-                                            (ushort)ReadInputRegister_typedef.VOLT, 7);
+                                            (ushort)ReadInputRegister_typedef.VOLT, 14);
                                         readAll = true;
                                     }
-                                    if (serialManage.IsOpen)
+                                    if (modbusSerial.IsOpen)
                                     {
-                                        serialManage.Write(mpkg, 0, 8);
-                                        Console.WriteLine("\n Mode Bus Sending :" + ByteToHex(mpkg, 0, 8));
+                                        modbusSerial.Write(mpkg, 0, 8);
+                                        Console.WriteLine("\n Mode Bus Sending : " + ByteToHex(mpkg, 0, 8));
                                     }
                                 }
                                 break;
@@ -259,41 +259,41 @@ namespace DemoMV
 
         static void modbusSerial_DataIn(object sender, SerialMessage e)
         {
-            Console.WriteLine("\n Data Incomming :" + ByteToHex(e.Data, 0, e.Length - 2));
+            Console.WriteLine("\n Data Incomming :" + ByteToHex(e.Data, 0, e.Length));
             modbus.ReadValue(e.Data);
             if (readAll)
             {
-                Console.WriteLine("\n V : {0}", modbus.Volt.ToString());
-                Console.WriteLine("\n I : {0}", modbus.Amp.ToString());
-                Console.WriteLine("\n Power : {0}", modbus.Power.ToString());
-                Console.WriteLine("\n Energy : {0}", modbus.Energy.ToString());
-                Console.WriteLine("\n Frequency : {0}", modbus.Frequency.ToString());
-                Console.WriteLine("\n PowerFactor : {0}", modbus.PowerFactor.ToString());
+                Console.WriteLine("\n V : {0} V", (modbus.Volt * 0.01).ToString());
+                Console.WriteLine("\n I : {0} A", (modbus.Amp * 0.001).ToString());
+                Console.WriteLine("\n Power : {0} W", modbus.Power.ToString());
+                Console.WriteLine("\n Energy : {0} KWh", (modbus.Energy * 0.1).ToString());
+                Console.WriteLine("\n Frequency : {0} Hz", (modbus.Frequency * 0.1).ToString());
+                Console.WriteLine("\n PowerFactor : {0}", (modbus.PowerFactor * 0.01).ToString());
                 readAll = false;
             }
             else if (modbus.LastRead == ReadInputRegister_typedef.VOLT)
             {
-                Console.WriteLine("\n V : {0}", modbus.Volt.ToString());
+                Console.WriteLine("\n V : {0} V", (modbus.Volt * 0.01).ToString());
             }
             else if (modbus.LastRead == ReadInputRegister_typedef.AMP)
             {
-                Console.WriteLine("\n I : {0}", modbus.Amp.ToString());
+                Console.WriteLine("\n I : {0} A", (modbus.Amp * 0.001).ToString());
             }
             else if (modbus.LastRead == ReadInputRegister_typedef.POWER)
             {
-                Console.WriteLine("\n Power : {0}", modbus.Power.ToString());
+                Console.WriteLine("\n Power : {0} W", modbus.Power.ToString());
             }
             else if (modbus.LastRead == ReadInputRegister_typedef.ENERGY)
             {
-                Console.WriteLine("\n Energy : {0}", modbus.Energy.ToString());
+                Console.WriteLine("\n Energy : {0} KWh", (modbus.Energy * 0.1).ToString());
             }
             else if (modbus.LastRead == ReadInputRegister_typedef.FREQUENCY)
             {
-                Console.WriteLine("\n Frequency : {0}", modbus.Frequency.ToString());
+                Console.WriteLine("\n Frequency : {0} Hz", (modbus.Frequency * 0.1).ToString());
             }
             else if (modbus.LastRead == ReadInputRegister_typedef.POWER_FACTOR)
             {
-                Console.WriteLine("\n PowerFactor : {0}", modbus.PowerFactor.ToString());
+                Console.WriteLine("\n PowerFactor : {0}", (modbus.PowerFactor * 0.01).ToString());
             }
 
             //throw new NotImplementedException();
