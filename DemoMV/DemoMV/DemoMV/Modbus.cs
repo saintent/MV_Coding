@@ -36,13 +36,13 @@ namespace DemoMV
     };
     public enum ReadInputRegister_typedef
     {
-        VOLT = 0,
-        AMP = 2,
-        POWER = 4,
-        ENERGY = 6,
-        HOUR_METER = 8,
-        POWER_FACTOR = 10,
-        FREQUENCY = 12
+        VOLT = 0x0000,
+        AMP = 0x0006,
+        POWER = 0x000C,
+        POWER_FACTOR = 0x001E,
+        FREQUENCY = 0x0046,
+        ENERGY = 0x0048,
+        STOP = 0xFFFF
     };
     public enum M_STATUS
     {
@@ -58,7 +58,6 @@ namespace DemoMV
         public int Amp;
         public int Power;
         public int Energy;
-        public int HourMeter;
         public int Frequency;
         public int PowerFactor;
         public ReadInputRegister_typedef LastRead;
@@ -84,132 +83,87 @@ namespace DemoMV
             LastRead = (ReadInputRegister_typedef)StrAddr;
             return result;
         }
+
+        public byte[] GenWrPkg(MOBUSFnCode_typedef FN, ushort StrAddr, ushort RegCount, byte[] Var, ref byte len)
+        {
+            byte[] result = new byte[128];
+            int pos = 0;
+            ushort crc;
+            result[pos++] = (byte)NodeAdress;
+            result[pos++] = (byte)FN;
+            result[pos++] = (byte)(StrAddr >> 8);
+            result[pos++] = (byte)StrAddr;
+            result[pos++] = (byte)(RegCount >> 8);
+            result[pos++] = (byte)RegCount;
+            result[pos++] = (byte)4;
+            result[pos++] = (byte)Var[0];
+            result[pos++] = (byte)Var[1];
+            result[pos++] = (byte)Var[2];
+            result[pos++] = (byte)Var[3];
+            crc = Crc16Cal(result, pos);
+            result[pos++] = (byte)(crc >> 8);
+            result[pos++] = (byte)crc;
+            len = (byte)pos;
+            //LastRead = 255;
+            return result;
+        }
+
         public void ReadValue(byte[] data)
         {
             ReadInputRegister_typedef next = LastRead;
-            int bytecout = data[2] + 3;
-            bool start = true;
-            int bitsf = 0;
-            for (int i = 3; i < bytecout; i++)
+            byte[] temp = { 0, 0, 0, 0 };
+            float raw;
+            switch (next)
             {
-                if (next == ReadInputRegister_typedef.VOLT)
-                {
-                    if (start)
-                    {
-                        start = false;
-                        bitsf = 32;
-                        Volt = 0;
-                    }
-                    bitsf = bitsf - 8;
-                    Volt |= data[i] << bitsf;
-                    if (bitsf == 0)
-                    {
-                        Volt = Volt >> 16;
-                        start = true;
-                        next = ReadInputRegister_typedef.AMP;
-                    }
-                }
-                else if (next == ReadInputRegister_typedef.AMP)
-                {
-                    if (start)
-                    {
-                        start = false;
-                        bitsf = 32;
-                        Amp = 0;
-                    }
-                    bitsf = bitsf - 8;
-                    Amp |= data[i] << bitsf;
-                    if (bitsf == 0)
-                    {
-                        Amp = Amp >> 16;
-                        start = true;
-                        next = ReadInputRegister_typedef.POWER;
-                    }
-                }
-                else if (next == ReadInputRegister_typedef.POWER)
-                {
-                    if (start)
-                    {
-                        start = false;
-                        bitsf = 32;
-                        Power = 0;
-                    }
-                    bitsf = bitsf - 8;
-                    Power |= data[i] << bitsf;
-                    if (bitsf == 0)
-                    {
-                        Power = Power >> 16;
-                        start = true;
-                        next = ReadInputRegister_typedef.ENERGY;
-                    }
-                }
-                else if (next == ReadInputRegister_typedef.ENERGY)
-                {
-                    if (start)
-                    {
-                        start = false;
-                        bitsf = 32;
-                        Energy = 0;
-                    }
-                    bitsf = bitsf - 8;
-                    Energy |= data[i] << bitsf;
-                    if (bitsf == 0)
-                    {
-                        Energy = Energy >> 16;
-                        start = true;
-                        next = ReadInputRegister_typedef.HOUR_METER;
-                    }
-                }
-                else if (next == ReadInputRegister_typedef.HOUR_METER)
-                {
-                    if (start)
-                    {
-                        start = false;
-                        bitsf = 32;
-                        HourMeter = 0;
-                    }
-                    bitsf = bitsf - 8;
-                    HourMeter |= data[i] << bitsf;
-                    if (bitsf == 0)
-                    {
-                        HourMeter = HourMeter >> 16;
-                        start = true;
-                        next = ReadInputRegister_typedef.POWER_FACTOR;
-                    }
-                }
-                else if (next == ReadInputRegister_typedef.FREQUENCY)
-                {
-                    if (start)
-                    {
-                        start = false;
-                        bitsf = 32;
-                        Frequency = 0;
-                    }
-                    bitsf = bitsf - 8;
-                    Frequency |= data[i] << bitsf;
-                    if (bitsf == 0)
-                    {
-                        Frequency = Frequency >> 16;
-                        start = true;
-                    }
-                }
-                else if (next == ReadInputRegister_typedef.POWER_FACTOR)
-                {
-                    if (start)
-                    {
-                        start = false;
-                        bitsf = 32;
-                        PowerFactor = 0;
-                    }
-                    bitsf = bitsf - 8;
-                    PowerFactor |= data[i] << bitsf;
-                    if (bitsf == 0)
-                    {
-                        PowerFactor = PowerFactor >> 16;
-                        start = true;
-                        next = ReadInputRegister_typedef.FREQUENCY;
-                    }
-                }
+                case ReadInputRegister_typedef.VOLT :
+                    temp[3] = data[3];
+                    temp[2] = data[4];
+                    temp[1] = data[5];
+                    temp[0] = data[6];
+                    raw = ConvertRaw(temp);
+                    Volt = (int)(raw * 100);
+                    break;
+                case ReadInputRegister_typedef.AMP:
+                    temp[3] = data[3];
+                    temp[2] = data[4];
+                    temp[1] = data[5];
+                    temp[0] = data[6];
+                    raw = ConvertRaw(temp);
+                    Amp = (int)(raw * 1000);
+                    break;
+                case ReadInputRegister_typedef.FREQUENCY:
+                    temp[3] = data[3];
+                    temp[2] = data[4];
+                    temp[1] = data[5];
+                    temp[0] = data[6];
+                    raw = ConvertRaw(temp);
+                    Frequency = (int)(raw * 10);
+                    break;
+                case ReadInputRegister_typedef.POWER:
+                    temp[3] = data[3];
+                    temp[2] = data[4];
+                    temp[1] = data[5];
+                    temp[0] = data[6];
+                    raw = ConvertRaw(temp);
+                    Power = (int)(raw);
+                    break;
+                case ReadInputRegister_typedef.POWER_FACTOR:
+                    temp[3] = data[3];
+                    temp[2] = data[4];
+                    temp[1] = data[5];
+                    temp[0] = data[6];
+                    raw = ConvertRaw(temp);
+                    PowerFactor = (int)(raw * 100);
+                    break;
+                case ReadInputRegister_typedef.ENERGY:
+                    temp[3] = data[3];
+                    temp[2] = data[4];
+                    temp[1] = data[5];
+                    temp[0] = data[6];
+                    raw = ConvertRaw(temp);
+                    Energy = (int)(raw * 10);
+                    break;
+
             }
         }
 
@@ -226,6 +180,13 @@ namespace DemoMV
 
             }
             return ((UInt16)((crcHi << 8) | crcLow));
+        }
+
+        private float ConvertRaw(byte[] Data)
+        {
+            float result;
+            result = BitConverter.ToSingle(Data, 0);
+            return result;
         }
 
         #region CRCTable
