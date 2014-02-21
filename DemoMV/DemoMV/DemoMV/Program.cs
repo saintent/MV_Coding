@@ -320,7 +320,7 @@ namespace DemoMV
 
         static void modbusSerial_DataIn(object sender, SerialMessage e)
         {
-            //Console.WriteLine("\n Data Incomming :" + ByteToHex(e.Data, 0, e.Length));
+            Console.WriteLine("\n Data Incomming :" + ByteToHex(e.Data, 0, e.Length));
             if (isWrite)
             {
                 isWrite = false;
@@ -331,34 +331,34 @@ namespace DemoMV
                 if (modbus.LastRead == ReadInputRegister_typedef.VOLT)
                 {
                     dataValue.Volt = (ushort)modbus.Volt;
-                    //Console.WriteLine("\n V : {0} V", (modbus.Volt * 0.01).ToString());
+                    Console.WriteLine("\n V : {0} V", (modbus.Volt * 0.01).ToString());
                     mpkg = modbus.GenPkg(MOBUSFnCode_typedef.ReadInputRegister,
                                             (ushort)ReadInputRegister_typedef.AMP, 2);
                     modbusSerial.Write(mpkg, 0, 8);
-                    //Console.WriteLine("\n Mode Bus Sending : " + ByteToHex(mpkg, 0, 8));
+                    Console.WriteLine("\n Mode Bus Sending : " + ByteToHex(mpkg, 0, 8));
                 }
                 else if (modbus.LastRead == ReadInputRegister_typedef.AMP)
                 {
                     dataValue.Amp = (uint)modbus.Amp;
-                    //Console.WriteLine("\n I : {0} A", (modbus.Amp * 0.001).ToString());
+                    Console.WriteLine("\n I : {0} A", (modbus.Amp * 0.001).ToString());
                     mpkg = modbus.GenPkg(MOBUSFnCode_typedef.ReadInputRegister,
                                            (ushort)ReadInputRegister_typedef.POWER, 2);
                     modbusSerial.Write(mpkg, 0, 8);
-                    //Console.WriteLine("\n Mode Bus Sending : " + ByteToHex(mpkg, 0, 8));
+                    Console.WriteLine("\n Mode Bus Sending : " + ByteToHex(mpkg, 0, 8));
                 }
                 else if (modbus.LastRead == ReadInputRegister_typedef.POWER)
                 {
                     dataValue.Power = (uint)modbus.Power;
-                    //Console.WriteLine("\n Power : {0} W", modbus.Power.ToString());
+                    Console.WriteLine("\n Power : {0} W", modbus.Power.ToString());
                     mpkg = modbus.GenPkg(MOBUSFnCode_typedef.ReadInputRegister,
                                            (ushort)ReadInputRegister_typedef.POWER_FACTOR, 2);
                     modbusSerial.Write(mpkg, 0, 8);
-                    //Console.WriteLine("\n Mode Bus Sending : " + ByteToHex(mpkg, 0, 8));
+                    Console.WriteLine("\n Mode Bus Sending : " + ByteToHex(mpkg, 0, 8));
                 }
                 else if (modbus.LastRead == ReadInputRegister_typedef.ENERGY)
                 {
                     dataValue.Energy = (uint)modbus.Energy;
-                    //Console.WriteLine("\n Energy : {0} KWh", (modbus.Energy * 0.1).ToString());
+                    Console.WriteLine("\n Energy : {0} KWh", (modbus.Energy * 0.1).ToString());
                     modbus.LastRead = ReadInputRegister_typedef.STOP;
                     Console.WriteLine("\n Meter Read Success");
                     ReadyPushData();
@@ -366,20 +366,20 @@ namespace DemoMV
                 else if (modbus.LastRead == ReadInputRegister_typedef.FREQUENCY)
                 {
                     dataValue.Fequency = (uint)modbus.Frequency;
-                    //Console.WriteLine("\n Frequency : {0} Hz", (modbus.Frequency * 0.1).ToString());
+                    Console.WriteLine("\n Frequency : {0} Hz", (modbus.Frequency * 0.1).ToString());
                     mpkg = modbus.GenPkg(MOBUSFnCode_typedef.ReadInputRegister,
                                            (ushort)ReadInputRegister_typedef.ENERGY, 2);
                     modbusSerial.Write(mpkg, 0, 8);
-                    //Console.WriteLine("\n Mode Bus Sending : " + ByteToHex(mpkg, 0, 8));
+                    Console.WriteLine("\n Mode Bus Sending : " + ByteToHex(mpkg, 0, 8));
                 }
                 else if (modbus.LastRead == ReadInputRegister_typedef.POWER_FACTOR)
                 {
                     dataValue.PF = (uint)modbus.PowerFactor;
-                    //Console.WriteLine("\n PowerFactor : {0}", (modbus.PowerFactor * 0.01).ToString());
+                    Console.WriteLine("\n PowerFactor : {0}", (modbus.PowerFactor * 0.01).ToString());
                     mpkg = modbus.GenPkg(MOBUSFnCode_typedef.ReadInputRegister,
                                            (ushort)ReadInputRegister_typedef.FREQUENCY, 2);
                     modbusSerial.Write(mpkg, 0, 8);
-                    //Console.WriteLine("\n Mode Bus Sending : " + ByteToHex(mpkg, 0, 8));
+                    Console.WriteLine("\n Mode Bus Sending : " + ByteToHex(mpkg, 0, 8));
                 }
             }
             //throw new NotImplementedException();
